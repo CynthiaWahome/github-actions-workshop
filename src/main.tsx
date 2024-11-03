@@ -18,3 +18,5 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+# A comment to enable me to edit the file and create a PR
