@@ -5,11 +5,18 @@ on:
 
 jobs:
   greet:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Greet the User
-        run: echo "Hello World!"
-        # List all files in the current directory fo rcomparison before and after actions/checkout@v2.
-      - run: ls -l
-      - uses: actions/checkout@v2
-      - run: ls -l
+      env:
+        MY_ENV: "Janice Smith"
+        
+      runs-on: ubuntu-latest
+      steps:
+        - name: Greet the User
+          run: echo "Hello World!"
+        - name: Run a multi-line script
+          run: |
+            echo "Jambo $MY_ENV"
+            echo "Vipi $GITHUB_ACTOR"
+          # List all files in the current directory fo rcomparison before and after actions/checkout@v2.
+        - run: ls -l
+        - uses: actions/checkout@v2
+        - run: ls -l
