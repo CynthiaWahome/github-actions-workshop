@@ -11,31 +11,55 @@ on:
 
 jobs:
   build:
-
+    name: "Build and Test"
     runs-on: ubuntu-latest
+    permissions:
+      # Required to allow actions/checkout to clone a repository onto the runner
+      contents: read
+      # Required to allow the vitest coverage action to write a comment into the pull request
+      pull-requests: write
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    # strategy:
+    #   matrix:
+    #     node-version: [18.x, 20.x, 22.x]
+    #     # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    
+    # As this is a frontend project, we don't need a matrix build strategy,
+    # which is more suited for backend projects that might run on several Node.js versions.
+    # Removing the matrix build will also make the tests run only once.
+
 
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 16.x
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    # Add the step to run the test coverage
+
+      # Run the standard tests to check functionality.
+      # This step executes the test script as defined in package.json.
+      # If the tests pass, you will see the standard test results.
+    - name: Run Tests
+      run: npm run test
+      # Add the step to run the test coverage
+      # Run tests with coverage enabled.
+      # This step explicitly generates a coverage report using Vitest.
+      # Coverage data can provide insights into which parts of your code are tested.
+      # Note: Having both steps means tests will run twice, once for standard output
+      # and once for coverage. This can be useful for a comprehensive analysis
     - name: Run test with Coverage
       run: npx vitest --coverage.enabled true
 
-    # Add the step to report coverage
+      # Add the step to report coverage
     - name: Report Coverage
-    # Set if: always() to also generate the report if tests are failing
-    # Only works if you set `reortOnFailure: true` in your vite config as specified above
+      # Set if: always() to also generate the report if tests are failing
+      # Only works if you set `reortOnFailure: true` in your vite config as specified above
+      # This action will handle the generation of a coverage report and can comment
+        # on the pull request if configured to do so.
       if: always()
       uses: davelosert/vitest-coverage-report-action@v2
       with: 
